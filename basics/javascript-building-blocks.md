@@ -584,3 +584,36 @@ btn.addEventListener("click", bgChange);
         video.play();
     });
     ```
+
+# 5. 이벤트 버블링
+캡처링을 활성화 하는 방법은 정해져있으니까(`addEventListener`의 세 번째 인자로 `true`넣기, `window.addEventListener`에서 캡처링, 옵션 객체에서 capture: true 설정.) 그 밖의 것은 버블링으로 볼 수 있을 듯.
+
+```html
+<!-- 이벤트 캡처링 -->
+<body>
+    <div id="container" style="border: 2px solid blue; padding: 20px;">
+        <button id="button">Click Here!</button>
+    </div>
+    <pre id="output"></pre> 
+    <!-- pre : preformatted text를 표시하는데 사용되는 태그 
+        주요 특징 1 : <pre> 태그 내부의 텍스트는 HTML에서 입력한 그대로 공백과 줄 바꿈이 유지됨
+        주요 특징 2 : <pre> 태그로 감싼 텍스트는 일반적으로 모노스페이스 폰트로 표시됨. 이는 코드 등 고정 폭 텍스트를 표현할 때 유용함.
+        주요 특징 3 : 자동 줄 바꿈 없음. 텍스트가 <pre> 태그의 너비를 초과해도 자동으로 줄 바꿈되지 않음. 그 대신 사용자가 명시적으로 줄 바꿈 추가 필요! -->
+    <script>
+        const output = document.querySelector("#output");
+
+        function handleClick(e) {
+            output.textContent += `${e.currentTarget.tagName} 요소를 클릭했습닏다.\n`;
+        }
+
+        const container = document.querySelector("#container");
+
+        //캡처링 활성화
+        container.addEventListener("click", handleClick, { capture: true});
+
+        const button = document.querySelector("#button");
+        button.addEventListener("click", handleClick);
+    </script>
+</body>
+
+```
