@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Object-oriented JavaScript inheritance</title>
+  </head>
+
+  <body>
+    <div>
+      <label for="jscode">Enter code:</label>
+      <input type="text" id="jscode">
+      <button>Submit code</button>
+    </div>
+
+    <p></p>
+  </body>
+
+    <script>
+      const input = document.querySelector('input');
+      const btn = document.querySelector('button');
+      const para = document.querySelector('p');
+
+      btn.onclick = function() {
+        const code = input.value;
+        para.textContent = eval(code);
+      }
+
+      // 생성자에 속성 정의
+      function Person(first, last, age, gender, interests) {
+        this.name = {
+          first,
+          last
+        };
+        this.age = age;
+        this.gender = gender;
+        this.interests = interests;
+      };
+
+      // 메소드는 전부 prototype에 정의되어 있음`
+      Person.prototype.bio = function() {
+        // First define a string, and make it equal to the part of
+        // the bio that we know will always be the same.
+        let string = this.name.first + ' ' + this.name.last + ' is ' + this.age + ' years old. ';
+        // define a variable that will contain the pronoun part of
+        // the second sentence
+        let pronoun;
+
+        // check what the value of gender is, and set pronoun
+        // to an appropriate value in each case
+        if(this.gender === 'male' || this.gender === 'Male' || this.gender === 'm' || this.gender === 'M') {
+          pronoun = 'He likes ';
+        } else if(this.gender === 'female' || this.gender === 'Female' || this.gender === 'f' || this.gender === 'F') {
+          pronoun = 'She likes ';
+        } else {
+          pronoun = 'They like ';
+        }
+
+        // add the pronoun string on to the end of the main string
+        string += pronoun;
+
+        // use another conditional to structure the last part of the
+        // second sentence depending on whether the number of interests
+        // is 1, 2, or 3
+        if(this.interests.length === 1) {
+          string += this.interests[0] + '.';
+        } else if(this.interests.length === 2) {
+          string += this.interests[0] + ' and ' + this.interests[1] + '.';
+        } else {
+          // if there are more than 2 interests, we loop through them
+          // all, adding each one to the main string followed by a comma,
+          // except for the last one, which needs an and & a full stop
+          for(let i = 0; i < this.interests.length; i++) {
+            if(i === this.interests.length - 1) {
+              string += 'and ' + this.interests[i] + '.';
+            } else {
+              string += this.interests[i] + ', ';
+            }
+          }
+        }
+
+        // finally, with the string built, we alert() it
+        alert(string);
+      };
+
+      // prototype에 메소드 정의
+      Person.prototype.greeting = function() {
+        alert('Hi! I\'m ' + this.name.first + '.');
+      };
+
+      Person.prototype.farewell = function() {
+        alert(this.name.first + ' has left the building. Bye for now!');
+      }
+
+      let person1 = new Person('Tammi', 'Smith', 17, 'female', ['music', 'skiing', 'kickboxing']);
+
+      function Teacher(first, last, age, gender, interests, subject) {
+        // Teacher()의 생성자는 Person()을 상속받았으므로 같은 매개변수들이 필요하기 때문에 동일한 매개변수들을 call()의 인자로 전달하여 실행함.
+        Person.call(this, first, last, age, gender, interests);
+
+        // 새 속성인 subject를 정의하여 Person이 아닌 Teacher만이 갖는 속성을 만들어 줌. 
+        this.subject = subject;
+      }
+
+      /* 
+      문제는 방금 정의한 Teacher 생성자에는 상속 받은 Person() 생성자의 prototype 속성이 없음. 
+
+      자바 스크립트 콘솔에서 Object.getOwnPropertyName(Teacher.prototype)을 치면 ['constructor']이 출력됨
+      콘솔에서 Object.getOwnPropertyName(Person.prototype)을 치면 ['constructor', 'bio', 'greeting', 'farewell']이 출력됨
+
+      Person.prototype.greeting => f() { alert('Hi! I\'m ' + this.name.first + '.');}
+      Teacher.prototype.greetign => undefined.
+
+      Teacher() 생성자는 Person()의 메서드를 상속받지 못했다!
+      */
+
+      // 그러면 Teacher()가 메소드도 상속받으려면 어떻게 해야 할까!?
+      Teacher.prototype = Object.create(Person.prototype);
+      // create()를 사용해 새로운 객체를 생성하여 Teacher.prototype으로 할당함. 새 객체는 Person.prototype 객체를 자신의 프로토타입으로 가지고 있으므로 Person.prototype에 정의된 모든 메소드를 사용할 수 있음!
+
+      Teacher.prototype.constructor = Teacher; // 나중에 constructor를 참조할 때 문제가 생기지 않도록 명시적으로 생성자를 바로 잡는 코드! (생성자 수동 조정) 
+
+      /* 정리)
+      1. 기본 동작
+        - 자바스크립트에서 생성자 함수(Teacher)를 만들면, 자동으로 그 생성자 함수의 prototype 객체가 생성됨.
+        - 이 prototype 객체는 기본적으로 constructor 속성을 가지고 있으며, 이 속성은 그 생성자 함수를 참조함. 
+        - 즉, 기본적으로 Teacher.prototype.constructor는 Teacher를 가리키고 있음.
+      2. Teacher.prototype = Object.create(Person.prototype)의 영향
+        - 이 코드는 Teacher.prototype을 Person.prototype을 기반으로 한 새 객체로 교체하는 코드. 
+        - 즉, 이제 Teacher.prototype은 원래의 constructor를 잃어버리고, Person.prototype의 모든 속성(메소드 포함)을 상속받게 됨. 
+      3. 문제가 되는 부분
+        - Teacher.prototype = Object.create(Person.prototype);
+        - 이 코드를 실행한 후, Teacher.prototype.constructor는 더 이상 Teacher를 가리키지 않고 Person을 가리키게 됨. 즉, Teacher.prototype.constructor가 Person을 참조하게 되는 것!
+      4. constructor 수동 수정
+        - 때문에, Teacher.prototype.constructor = Teacher; 코드를 통해 Teacher.prototype.constructor를 Teacher로 되돌려주는 코드를 추가하는 것!
+      */
+
+      /* 
+      근데 사실 저 마지막 코드를 추가할 때나 안 할때나 콘솔에서 결과가 동일하게 출력되었음 왜일까?
+      -> 프로토타입 체인에 따라 constructor가 설정되지 않더라도, 자바스크립트가 프로토타입 체인에서 Teacher 자체를 인식해서(적절한 값을 찾기 때문에) 동일한 함수 표현식이 출력될 수 있다고 함!
+      그치만 Teacher.prototype.constructor = Teacher; 이런식으로 코드를 추가하는 것이 명시적으로 constructor를 바로잡는 좋은 습관이라고 한다! (나중에 생성자를 참조할 때 문제가 생기지 않도록 방지해주니까!)
+      */
+      Teacher.prototype.greeting = function () {
+        var prefix;
+
+        if (
+          this.gender === "male" ||
+          this.gender === "Male" ||
+          this.gender === "m" ||
+          this.gender === "M"
+        ) {
+          prefix = "Mr.";
+        } else if (
+          this.gender === "female" ||
+          this.gender === "Female" ||
+          this.gender === "f" ||
+          this.gender === "F"
+        ) {
+          prefix = "Mrs.";
+        } else {
+          prefix = "Mx.";
+        }
+
+        alert(
+          "Hello. My name is " +
+            prefix +
+            " " +
+            this.name.last +
+            ", and I teach " +
+            this.subject +
+            ".",
+        );
+      };
+
+      var teacher1 = new Teacher(
+        "Han",
+        "Gyodong",
+        30,
+        "male",
+        ["football", "cookery"],
+        "mathmatics",
+      );
+
+    </script>
+</html>
