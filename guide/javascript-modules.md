@@ -157,3 +157,158 @@ import {
 
 ### import에서 이름을 변경하는 것이 일반적. 
 대부분의 경우 모듈의 코드에 직접 수정할 권한이 없기 때문에! import시 이름을 변경하는 것이 더 유연하다. 
+
+## 모듈을 깔끔하고 효율적으로 관리하기 위한 두 가지 방법
+### 1. Creating a Module Object (모듈 객체 생성)
+기존의 import 문에서 각각의 함수나 변수를 따로 가져오는 방법은 복잡하고 지저분할 수 있기 때문에 이를 개선하기 위해 모듈 전체를 객체로 가져올 수 있음.
+- 이렇게 하면 모듈 안에 있는 함수들이 객체의 멤버로 취급되며, 네임스페이스처럼 활용할 수 있다!
+
+- 방법
+  - 모듈을 가져올 때 다음 구문을 사용하여 모든 export를 한 번에 가져옴:
+    ```js
+    import * as Module from "./modules/module.js";
+    ```
+  - module.js 내의 모든 export된 항목들을 Module 객체 안에 포함시키고, 그 후 객체를 통해 함수나 변수를 호출할 수 있음.
+    ```js
+    Module.function1()
+    Module.function2()
+    ```
+- 예시
+  ```js
+  // module.js 안에서 export
+  export { name, draw, reportArea, reportPerimeter };
+
+  // main.js에서는 각 모듈을 객체로 가져와서 사용
+  import * as Square from "./modules/square.js";
+  import * as Circle from "./modules/circle.js";
+  import * as Triangle from "./modules/triangle.js";
+
+  // Square, Circle, Triangle 객체를 통해 각 도형의 기능에 접근 가능
+  let square1 = Square.draw(myCanvas.ctx, 50, 50, 100, "blue");
+  Square.reportArea(square1.length, reportList);
+  Square.reportPerimeter(square1.length, reportList); 
+  ```
+  - 이렇게 하면 import문을 간소화하고 모듈 내의 함수들을 명확하게 구분할 수 있는 장점이 있다!
+  
+### 2. Modules and Classes (모듈과 클래스)
+모듈을 클래스로 구성하는 것도 이름 충돌을 피하고 모듈을 더 구조적으로 관리하는 또 다른 방법!
+- 특히 코드가 객체 지향 스타일로 작성되어 있거나, 도형 그리기와 같은 작업을 할 때 유용하다. 
+  
+- 클래스 사용 방법 예시
+  ```js
+  // square.js 파일
+  class Square {
+    constructor(ctx, listId, length, x, y, color) {
+      // 클래스 생성자
+    }
+
+    draw() {
+      // 사각형을 그리는 메서드
+    }
+
+    reportArea() {
+      // 사각형의 면적을 보고하는 메서드
+    }
+
+    reportPerimeter() {
+      // 사각형의 둘레를 보고하는 메서드
+    }
+  }
+  export { Square };
+
+
+  // main.js 파일에서 클래스 import:
+  import { Square } from "./modules/square.js";
+
+  // 이제 클래스 인스턴스를 생성하고 메서드를 호출하여 사각형을 그릴 수 있음
+  let square1 = new Square(myCanvas.ctx, myCanvas.listId, 50, 50, 100, "blue");
+  square1.draw();
+  square1.reportArea();
+  square1.reportPerimeter();
+  ```
+
+ ### 클래스 사용의 장점
+ 1. 캡슐화 : 모든 기능이 클래스로 묶여 있어 관리가 용이함
+ 2. 코드 재사용성: 클래스를 이용하면 다른 도형도 쉽게 확장 가능하고, 재사용성이 높아짐
+ 3. 구조적인 코드: 객체 지향 프로그래밍의 장점을 살려, 더 체계적인 코드 구성이 가능!
+
+
+## 모듈 집합(Aggregating Modules)
+때로는 여러 모듈을 상위 모듈에서 결합하고, 이를 통해 여러 서브 모듈의 기능을 상위 모듈로 가져올 수 있음
+- 이 방법은 프로젝트 구조가 복잡해질 때 특히 유용하며, 이를 통해 중앙화된 관리가 가능하다!
+- 방법:
+  - 상위 모듈에서 여러 모듈을 집합하기 위해 `export * from` 혹은 `export { name } from` 구문을 사용함:
+    ```js
+    export * from "x.js";  // x.js의 모든 export 항목을 다시 export
+    export { name } from "x.js"; // x.js에서 특정 항목만 다시 export
+    ```
+- 예시:
+  - 모듈 구조
+    ```text
+    modules/
+      canvas.js
+      shapes.js
+      shapes/
+        circle.js
+        square.js
+        triangle.js
+    ```
+    - 여러 서브 모듈(circle, square, triangle)을 shapes.js라는 상위 모듈로 묶고, 각 하위모듈에서는 필요한 클래스나 함수를 export함
+      ```js
+      export { Square }
+      ```
+    - shapes.js에서 각 모듈의 export를 집합함
+      ```js
+      export { Square } from "./shapes/square.js";
+      export { Triangle } from "./shapes/triangle.js";
+      export { Circle } from "./shapes/circle.js";
+      ```
+    - shapes.js 모듈을 통해 모든 도형 관련 기능을 import 할 수 있게 됨  
+      ```js
+      import { Square, Circle, Triangle } from "/js-examples/modules/module-aggregation/modules/shapes.js";
+      ```
+      - 개별적으로 여러 모듈을 import 하는 것보다 훨씬 깔끔하고 효율적!
+
+## 동적 모듈 로딩(Dynamic Module Loading)
+필요할 때만 모듈을 로드하는 방식으로, 성능 최적화에 매우 유리함. 특히 브라우저에서 사용하는 JavaScript에서는 페이지 로딩 속도를 개선할 수 있다!
+
+- 방법:
+  - JavaScript의 import() 함수를 사용하면 Promise를 반환하여 동적으로 모듈을 가져올 수 있음.
+    ```js
+    import("/modules/myModule.js").then((module) => {
+      // 모듈을 사용한 작업 수행
+    });
+    ```
+    - 이렇게 하면 모든 모듈을 초기 로드 시에 불러오는 것이 아니라, 필요한 순간에만 모듈을 로드할 수 있어 성능 이점이 크다.
+- 예시: 
+  - index.html에 도형을 그릴 버튼 추가
+    ```html
+    <button class="square">Square</button>
+    <button class="circle">Circle</button>
+    <button class="triangle">Triangle</button>
+    ```
+  - main.js에서 각 버튼에 대한 참조를 가져오고, 클릭할 때마다 모듈을 로드함
+    ```js
+    let squareBtn = document.querySelector(".square");
+
+    squareBtn.addEventListener("click", () => {
+      import("/js-examples/modules/dynamic-module-imports/modules/square.js").then(
+        (Module) => {
+          let square1 = new Module.Square(
+            myCanvas.ctx,
+            myCanvas.listId,
+            50,
+            50,
+            100,
+            "blue"
+          );
+          square1.draw();
+          square1.reportArea();
+          square1.reportPerimeter();
+        }
+      );
+    });
+    ```
+- 동적 로딩의 장점
+  - 성능 최적화: 초기 로딩 속도를 개선하고, 필요할 때만 모듈을 로드하므로 메모리 효율이 좋아짐
+  - 유연성: 사용자가 특정 작업을 요청할 때 해당 모듈을 불러오므로 유연하게 대응 가능
