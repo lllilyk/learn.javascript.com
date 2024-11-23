@@ -21,7 +21,7 @@ console.log(sumNumbers);
 const numbers = [5, 10, 15, 25, 30];
 
 const firstNumberOverTwenty = numbers.find(number => number > 20);
-console.log(bigTwenty);
+console.log(firstNumberOverTwenty);
 
 // some 메서드를 사용해서 짝수가 있는지 여부를 출력하세요.
 const numbers = [1, 3, 5, 7, 10];
@@ -36,6 +36,8 @@ const hasAnyEven = numbers.some(number => number % 2 ===0);
     const words = ['Hello', 'world', 'this', 'is', 'JavaScript'];
     // join 메서드를 사용해서 하나의 문자열로 결합해보세요.
     
+    const joinAllWords = words.join(" ");
+    console.log(joinAllWords);
     ```
 
 2. 문자열을 배열로 분리하기
@@ -43,7 +45,9 @@ const hasAnyEven = numbers.some(number => number % 2 ===0);
     ```js
     const sentence = 'JavaScript is fun to learn';
     // split 메서드를 사용해서 문장을 단어 배열로 분리하세요.
-
+    
+    const splitSentence = sentence.split(" ");
+    console.log(splitSentence);
     ```
 
 3. 문자열 배열의 길이 기준 필터링
@@ -52,6 +56,8 @@ const hasAnyEven = numbers.some(number => number % 2 ===0);
     const words = ['apple', 'banana', 'kiwi', 'orange', 'pear'];
     // filter 메서드를 사용해서 길이가 5 이상인 단어들만 추출하세요.
 
+    const overFiveLetter = words.filter(word => word.length >= 5);
+    console.log(overFiveLetter);
     ```
 
 4. 문자열을 뒤집기
@@ -60,6 +66,10 @@ const hasAnyEven = numbers.some(number => number % 2 ===0);
     const str = 'JavaScript';
     // split, reverse, join 메서드를 사용해서 문자열을 뒤집어보세요.
 
+    const splitStr = str.split("");
+    const reverseSplitStr = splitStr.reverse();
+    const joinReverseSplitStr = reverseSplitStr.join("");
+    console.log(joinReverseSplitStr);
     ```
 
 5. 각 단어의 첫 글자만 대문자로 변환하기
@@ -67,7 +77,18 @@ const hasAnyEven = numbers.some(number => number % 2 ===0);
     ```js
     const sentence = 'javascript is really fun to learn';
     // map 메서드와 문자열 메서드를 사용해서 각 단어의 첫 글자만 대문자로 변환하세요.
+    
+    // 일단 단어 단위로 나누기
+    const splitSentence = sentence.split(" "); // ['javascript', 'is', 'really', 'fun', 'to', 'learn']
+    
+    // map을 사용해서 각 단어의 첫 글자는 대문자로 바꾸고 나머지는 소문자 유지
+    const capitalized = splitSentence.map(word => {
+        return word[0].toUpperCase() + word.slice(1).toLowerCase();
+    });
 
+    // 단어를 문장으로 합치기
+    const result = capitalized.join(" ");
+    console.log(result);
     ```
 
 6. 문자열에서 특정 문자 제거하기
@@ -76,4 +97,8 @@ const hasAnyEven = numbers.some(number => number % 2 ===0);
     const sentence = 'I am learning JavaScript and it is amazing';
     // split, filter, join 메서드를 사용해서 'a' 문자를 제거하세요.
 
+    const splitSentence = sentence.split("");
+    const notAword = splitSentence.filter(word => word != "a");
+
+    const joinWords = notAword.join("");
     ```
