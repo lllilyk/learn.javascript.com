@@ -443,7 +443,19 @@ export default Greeting;
     
 - TSX 코드:
     ```jsx
+    interface ItemListProps {
+        items: string[];
+    }
 
+    const ItemList = ({ items }: ItemListProps) => {
+        return (
+            <ul>
+            {items.map((item, index) => {
+                <li key={index}>{item}</li>
+            })}
+            </ul>
+        );
+    }
     ```
 
 
@@ -453,14 +465,14 @@ export default Greeting;
     import { useState } from "react";
 
     function Counter({ initialCount }) {
-    const [count, setCount] = useState(initialCount);
+        const [count, setCount] = useState(initialCount);
 
-    return (
-        <div>
-        <p>Count: {count}</p>
-        <button onClick={() => setCount(count + 1)}>Increment</button>
-        </div>
-    );
+        return (
+            <div>
+            <p>Count: {count}</p>
+            <button onClick={() => setCount(count + 1)}>Increment</button>
+            </div>
+        );
     }
 
     export default Counter;
@@ -471,8 +483,27 @@ export default Greeting;
 
 - TSX 코드:
     ```tsx
+    interface CounterProps {
+        initialCount: number;
+    }
 
+    const Counter = ({ initialCount }: CounterProps) => {
+        const [count, setCount] = useState<number>(initialCount);
+
+        return (
+            <div>
+                <p>Count: {count}</p>
+                <button onClick={() => setCount(count + 1)}>Increment</button>
+            </div>
+        );
+    };
+
+    export default Counter;
     ```
+- useState 타입 명시 방법
+    - 제너릭(Generic) 사용
+        - useState는 제너릭을 사용하여 상태 값의 타입을 명시할 수 있음
+        - useState<number>를 사용하여 상태 값이 숫자임을 명시함
 
 ### 8. 객체 Props
 - JSX 코드:
