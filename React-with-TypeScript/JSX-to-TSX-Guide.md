@@ -349,7 +349,24 @@ export default Greeting;
 
 - TSX 코드:
     ```tsx
+    interface CardProps {
+        title: string;
+        children?: ReactNode; 
+        // React에서 children의 타입은 보통 ReactNode로 정의함
+        // ReactNode는 JSX 요소(<div>, <p> 등), 문자열, 숫자, null 등 React에서 렌더링 가능한 모든 것을 포함함
+        // 컴포넌트가 항상 children을 받을 필요는 없으므로 ?를 사용해 선택적으로 만들어줌
+    }
 
+    const Card = ({ title, children }: CardProps) => {
+        return (
+            <div>
+            <h1>{title}</h1>
+            <div>{children}</div>
+            </div>
+        );
+    }
+
+    export default Card;
     ```
 
 ### 5. Event Handling
@@ -366,8 +383,45 @@ export default Greeting;
 
 - TSX 코드:
     ```tsx
+    interface TextInputProps {
+        onChange: (event: React.ChangeEvent<HTMLInputElement>) => void; // onChange 이벤트 타입
+    }
 
+    const TextInput = ({ onChange }: TextInputProps ) => {
+        return <input type="text" onChange={onChange} />;
+    }
+
+    export default TextInput;
     ```
+    - 코드 분석
+        1. React.ChangeEvent<HTMLInputElement>
+            - React.ChangeEvent는 React에서 입력 필드(<input>, <textarea>, <select> 등)에 발생하는 이벤트 타입을 정의
+            - <HTMLInputElement>를 제너릭으로 전달하여 특정 HTML 요소의 이벤트임을 명시함
+        2. onChange 타입 정의
+            - onChange는 함수로, 이벤트 객체(React.ChangeEvent<HTMLInputElement>)를 매개변수로 받고 반환값은 void임
+            - 타입 정의: (event: React.ChangeEvent<HTMLInputElement>) => void
+        3. TextInputProps 인터페이스
+            - TextInputProps는 onChange가 필수적으로 제공되며, 올바른 이벤트 타입을 받도록 보장함
+
+    - 컴포넌트 사용 예:
+        ```tsx
+        const App = () => {
+            const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+                console.log("Input value:", event.target.value);
+            };
+            
+            return <TextInput onChange={handleChange} />; 
+            // 입력필드의 값이 변경되면 handleChange 함수가 실행되고, 입력된 값이 콘솔에 출력됨
+        };
+
+        export default App;
+        ```
+
+- React의 주요 이벤트 타입
+    - React.ChangeEvent<HTMLInputElement>: <input> 요소에서 발생하는 이벤트
+    - React.MouseEvent<HTMLButtonElement>: <button> 클릭 이벤트
+    - React.FormEvent<HTMLFormElement>: <form> 제출 이벤트
+
 
 ### 6. 배열 Props
 - JSX 코드:
