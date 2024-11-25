@@ -505,16 +505,17 @@ export default Greeting;
         - useState는 제너릭을 사용하여 상태 값의 타입을 명시할 수 있음
         - useState<number>를 사용하여 상태 값이 숫자임을 명시함
 
+
 ### 8. 객체 Props
 - JSX 코드:
     ```jsx
     function UserInfo({ user }) {
-    return (
-        <div>
-        <h1>{user.name}</h1>
-        <p>{user.age} years old</p>
-        </div>
-    );
+        return (
+            <div>
+            <h1>{user.name}</h1>
+            <p>{user.age} years old</p>
+            </div>
+        );
     }
 
     export default UserInfo;
@@ -524,14 +525,29 @@ export default Greeting;
 
 - TSX 코드:
     ```tsx
+    interface UserInfoProps {
+        user: {
+            name: string;
+            age: number;
+        };
+    }
 
+    const UserInfo = ({ user }: UserInfoProps) => {
+        return (
+            <div>
+            <h1>{user.name}</h1>
+            <p>{user.age} years old</p>
+            </div>
+        );
+    }
     ```
+
 
 ### 9. 함수 Props
 - JSX 코드:
     ```jsx
     function ActionButton({ onClick }) {
-    return <button onClick={onClick}>Click me</button>;
+        return <button onClick={onClick}>Click me</button>;
     }
 
     export default ActionButton;
@@ -541,20 +557,35 @@ export default Greeting;
 
 - TSX 코드:
     ```tsx
+    interface ButtonProps {
+        onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+    }
 
+    const ActionButton = ({ onClick }: ButtonProps) => {
+        return <button onClick={onClick}>Click me</button>;
+    }
+
+    export default ActionButton;
     ```
+    - `React.MouseEvent` 사용
+      - `React.MouseEvent` 타입은 이벤트 객체를 타입으로 지정할 때 사용함
+      - `HTMLButtonElement`는 버튼 요소를 나타내는 `DOM 타입`이며, `React.MouseEvent`의 `제네릭 타입`으로 전달됨
+    - 타입 정의 정확성
+      - `(event: React.MouseEvent<HTMLButtonElement>) => void;`는 함수의 매개변수와 반환값을 명확히 정의함
+      - 반환값이 없는 함수는 void로 지정하는 것이 TypeScript에서 기본적인 스타일임
+
 
 ### 10. 복잡한 Props 구조
 - JSX 코드:
     ```jsx
     function BlogPost({ post }) {
-    return (
-        <article>
-        <h1>{post.title}</h1>
-        <p>{post.content}</p>
-        <p>Written by: {post.author}</p>
-        </article>
-    );
+        return (
+            <article>
+            <h1>{post.title}</h1>
+            <p>{post.content}</p>
+            <p>Written by: {post.author}</p>
+            </article>
+        );
     }
 
     export default BlogPost;
@@ -565,5 +596,27 @@ export default Greeting;
 
 - TSX 코드:
     ```tsx
+    interface Post {
+        title: string;
+        content: string;
+        author: string;
+    }
 
+    // post 객체가 커지거나 구조가 복잡해질 경우, post만 따로 타입 정의를 분리할 수 있음.
+    // 이렇게 하면 post 타입을 재사용할 수 있어 유지보수성이 높아짐!
+    interface PostProps {
+        post: Post;
+    }
+
+    const BlogPost = ({ post }: PostProps) => {
+        return (
+            <article>
+            <h1>{post.title}</h1>
+            <p>{post.content}</p>
+            <p>Written by: {post.author}</p>
+            </article>
+        );
+    }
+
+    export default BlogPost;
     ```
